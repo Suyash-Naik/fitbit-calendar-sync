@@ -1,6 +1,6 @@
 # Fitbit Calendar Sync
 
-A Google Apps Script that copies your **sleep, naps and workouts** from the **Google Health API** (the successor to the Fitbit Web API) into a private **"Fitbit"** Google Calendar. It runs every 4 hours under your own Google account and replaces the old IFTTT applet.
+A Google Apps Script that copies your **sleep, naps and workouts** from the **Google Health API** (the successor to the Fitbit Web API) into a private **"Fitbit"** Google Calendar. It runs every 4 hours under your own Google account.
 
 ```
 💤 Sleep 8h 05m · 95%                    🏋️ Strength training · 59m
@@ -40,8 +40,13 @@ fitbit-calendar-sync/
 │  ├─ calendar.js       "Fitbit" calendar + idempotent upsert
 │  └─ debug.js          debugDump, debugSchema, debugWorkoutTypes (schema views are values-free)
 ├─ test/                node --test unit tests + scrubbed fixtures
-└─ docs/                reference material, see docs/index.md
+├─ docs/                reference material, see docs/index.md
+├─ site/                public website: index.html, privacy.html, terms.html
+└─ .github/workflows/
+   └─ pages.yml         deploys site/ to GitHub Pages on push
 ```
+
+**Website:** `site/` is published to GitHub Pages at `https://<github-username>.github.io/<repo-name>/`. Google's consent screen needs these home, privacy and terms URLs to publish the app. One-time setup: repo **Settings → Pages → Source: GitHub Actions** (details in [docs/guide.md](docs/guide.md), Part D).
 
 ## Quick start
 
@@ -81,7 +86,7 @@ In the Apps Script editor (functions ending in `_` are private and hidden from t
 
 ## Known limitations
 
-- **7-day re-authorization.** The OAuth consent screen is in *Testing*, so the health authorization expires weekly. You get an alert email; fix it by running `authorizeHealth`. Publishing removes the limit (guide, Part D).
+- **7-day re-authorization.** The OAuth consent screen is in *Testing*, so the health authorization expires weekly. You get an alert email; fix it by running `authorizeHealth`. Publishing removes the limit. Next steps. 
 - **No Sleep Score.** The Google Health API doesn't expose it. Efficiency is computed as asleep ÷ in bed.
 - **No auto-detected vs manual flag** for workouts. Use `MIN_WORKOUT_MINUTES` / `EXCLUDE_TYPES` to filter.
 - **Workout icons** are mapped only for types seen in real data or the docs. Unknown types show 💪. Run `debugWorkoutTypes` to find the exact enum before adding one in `parse.js`.
