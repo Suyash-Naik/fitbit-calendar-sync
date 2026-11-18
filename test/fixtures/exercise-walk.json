@@ -1,0 +1,20 @@
+{
+  "dataPointName": "users/0000000000000000000/dataTypes/exercise/dataPoints/1111111111111111111",
+  "exercise": {
+    "interval": { "startTime": "2026-11-15T16:47:13Z", "startUtcOffset": "3600s", "endTime": "2026-11-15T17:15:26Z", "endUtcOffset": "3600s" },
+    "exerciseType": "WALKING",
+    "metricsSummary": {
+      "caloriesKcal": 138, "distanceMillimeters": 786328, "steps": "1203",
+      "averagePaceSecondsPerMeter": 2.1530455484225413, "averageHeartRateBeatsPerMinute": "84",
+      "elevationGainMillimeters": 5035.942026981165,
+      "heartRateZoneDurations": { "lightTime": "1680s", "moderateTime": "0s", "vigorousTime": "0s", "peakTime": "0s" }
+    },
+    "exerciseMetadata": {},
+    "displayName": "Walk",
+    "activeDuration": "1693s",
+    "exerciseEvents": [
+      { "eventTime": "2026-11-15T16:47:13Z", "eventUtcOffset": "3600s", "exerciseEventType": "START" },
+      { "eventTime": "2026-11-15T17:15:26Z", "eventUtcOffset": "3600s", "exerciseEventType": "STOP" }
+    ]
+  }
+}
