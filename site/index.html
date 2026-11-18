@@ -5,39 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fitbit Calendar Sync</title>
 <meta name="description" content="A personal Google Apps Script that copies Fitbit sleep, naps and workouts from the Google Health API into a private Google Calendar.">
-<style>
-  :root { --bg:#fff; --fg:#222; --muted:#666; --card:#f5f6f8; --accent:#1a73e8; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#16181d; --fg:#e8e8e8; --muted:#9aa0a6; --card:#22252b; --accent:#8ab4f8; }
-  }
-  body { font:16px/1.6 system-ui, sans-serif; max-width:720px; margin:2rem auto; padding:0 16px; color:var(--fg); background:var(--bg); }
-  h1 { font-size:1.8rem; margin-bottom:.25rem; }
-  .tag { color:var(--muted); margin-top:0; }
-  a { color:var(--accent); }
-  pre { background:var(--card); padding:12px 16px; border-radius:8px; overflow-x:auto; font-size:.9rem; }
-  nav { display:flex; gap:1.25rem; flex-wrap:wrap; margin:1.5rem 0; }
-  footer { color:var(--muted); font-size:.85rem; margin-top:3rem; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Fitbit Calendar Sync</h1>
-<p class="tag">Sleep, naps and workouts → a private Google Calendar</p>
+<header class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="./">Fitbit Calendar Sync</a>
+    <nav aria-label="Site">
+      <a href="./" aria-current="page">Home</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="https://github.com/Suyash-Naik/fitbit-calendar-sync">GitHub</a>
+    </nav>
+  </div>
+</header>
 
-<p>Fitbit Calendar Sync is a personal <strong>Google Apps Script</strong>. It reads sleep sessions and workouts from the <strong>Google Health API</strong> (read-only) and adds them as private, "free" events to a calendar named <em>Fitbit</em> in the same Google account. It runs every few hours inside that account. There is no server, and no data leaves Google.</p>
+<main>
+  <h1>Fitbit Calendar Sync</h1>
+  <p class="lead">Sleep, naps and workouts in a private Google Calendar.</p>
 
-<pre>💤 Sleep 8h 05m · 95%
+  <p>Fitbit Calendar Sync is a personal <strong>Google Apps Script</strong>. It reads sleep sessions and workouts from the <strong>Google Health API</strong> (read-only) and adds them as private, "free" events to a calendar named <em>Fitbit</em> in the same Google account. It runs every few hours inside that account. There is no server, and no data leaves Google.</p>
+
+  <div class="stats-strip">
+    <div class="stat"><span class="stat-value">4 h</span><span class="stat-label">sync interval</span></div>
+    <div class="stat"><span class="stat-value">3</span><span class="stat-label">event types<br>sleep · nap · workout</span></div>
+    <div class="stat"><span class="stat-value">0</span><span class="stat-label">servers or<br>third parties</span></div>
+  </div>
+
+  <h2>What lands in the calendar</h2>
+<pre><code>💤 Sleep 8h 05m · 95%
 Deep 1h 11m · Rem 1h 19m · Light 5h 35m · Awake 24m
+Asleep 8h 05m · In bed 8h 29m · Efficiency 95%
 
 🏋️ Strength training · 59m
-Active 59m · 458 kcal · Avg HR 124 bpm · 51 Zone Minutes</pre>
+Active 59m · 458 kcal
+Avg HR 124 bpm · 51 Zone Minutes
+HR zones: light 12m · moderate 43m · vigorous 4m</code></pre>
 
-<p>It is a single-user, non-commercial tool and isn't offered as a public service.</p>
+  <p>Events are marked <strong>Free</strong>, so they never block meeting availability. They are also <strong>private</strong>. Re-runs update existing events instead of creating duplicates.</p>
 
-<nav>
-  <a href="privacy.html">Privacy Policy</a>
-  <a href="terms.html">Terms of Service</a>
-</nav>
+  <div class="actions">
+    <a class="btn-primary" href="https://github.com/Suyash-Naik/fitbit-calendar-sync">View on GitHub</a>
+    <a class="btn-outline" href="privacy.html">Privacy Policy</a>
+  </div>
 
-<footer>Last updated 18 November 2026. Not affiliated with Google or Fitbit.</footer>
+  <p class="meta">A single-user, non-commercial tool. It isn't offered as a public service.</p>
+</main>
+
+<footer class="site-footer">
+  © 2026 Suyash Naik · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · Not affiliated with Google or Fitbit
+</footer>
 </body>
 </html>

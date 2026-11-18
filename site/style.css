@@ -1,0 +1,185 @@
+/*
+ * Fitbit Calendar Sync site styles.
+ * A plain-CSS port of the shared suyashnaik.com theme. Source:
+ * LC-pet-stat/docs/custom.scss (on top of Quarto's Lux light / Darkly dark themes).
+ * If the typography or colours change there, mirror them here.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
+
+/* ─── Tokens ─────────────────────────────────────────────────────────────── */
+
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "DM Serif Display", Georgia, serif;
+
+  --accent: #7a6a95;          /* $my-accent (violet) */
+  --accent-hover: #6a5c82;    /* darken($my-accent, 8%) */
+  --link: #7c3aed;            /* $link-color */
+
+  --bg: #ffffff;              /* Lux body bg */
+  --fg: #55595c;              /* Lux body text */
+  --heading: #1a1a1a;         /* Lux heading colour */
+  --muted: rgba(85, 89, 92, 0.75);
+  --border: #dee2e6;
+  --surface: #f8f9fa;         /* cards / code blocks */
+  --code: #7d12ba;
+
+  --navbar-bg: var(--accent);
+  --navbar-fg: #ffffff;
+  --footer-bg: #f7f7f5;
+  --footer-fg: #666666;
+
+  --body-width: 860px;
+}
+
+/* Dark: Darkly base + the same accent */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #222222;
+    --fg: #e9e9e9;
+    --heading: #ffffff;
+    --muted: rgba(255, 255, 255, 0.65);
+    --border: #444444;
+    --surface: #2c2c2c;
+    --code: #c9a7ff;
+    --link: #b69cff;          /* lighter violet: keeps contrast on #222 */
+    --footer-bg: #1b1b1b;
+    --footer-fg: #9a9a9a;
+  }
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;         /* $font-size-base */
+  line-height: 1.7;           /* $line-height-base */
+  color: var(--fg);
+  background: var(--bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;           /* DM Serif Display ships one weight */
+  line-height: 1.2;
+  color: var(--heading);
+  margin: 2rem 0 0.75rem;
+}
+h1 { font-size: calc(1.6rem + 1vw); margin-top: 0; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.25rem; }
+
+a { color: var(--link); font-weight: 500; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+p, ul, ol { margin: 0 0 1rem; }
+li { margin-bottom: 0.35rem; }
+strong { color: var(--heading); font-weight: 600; }
+
+code, pre { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 0.9em; }
+code { color: var(--code); }
+pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  line-height: 1.55;
+}
+pre code { color: var(--fg); }
+@media (max-width: 600px) {
+  pre { white-space: pre-wrap; padding: 0.85rem 1rem; }
+}
+
+/* ─── Navbar (Lux: uppercase, semibold) ─────────────────────────────────── */
+
+.navbar {
+  position: sticky;           /* Quarto "pinned: true" */
+  top: 0;
+  z-index: 10;
+  background: var(--navbar-bg);
+  color: var(--navbar-fg);
+}
+.navbar-inner {
+  max-width: var(--body-width);
+  margin: 0 auto;
+  padding: 1rem 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+.navbar a {
+  color: var(--navbar-fg);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.navbar a:hover { color: rgba(255, 255, 255, 0.8); }
+.navbar .brand { font-size: 1.05rem; letter-spacing: 0.08em; }
+.navbar nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
+.navbar nav a[aria-current="page"] { border-bottom: 2px solid rgba(255, 255, 255, 0.85); }
+
+/* ─── Main ───────────────────────────────────────────────────────────────── */
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--body-width);
+  margin: 0 auto;
+  padding: 3rem 16px 4rem;
+}
+
+.lead { font-size: 1.2rem; color: var(--muted); margin-top: -0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+
+/* ─── Buttons (from custom.scss) ────────────────────────────────────────── */
+
+.btn-primary, .btn-outline {
+  display: inline-block;
+  padding: 0.55rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.btn-primary { background: var(--accent); color: #fff; border: 1.5px solid var(--accent); }
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
+.btn-outline { border: 1.5px solid var(--accent); color: var(--link); }
+.btn-outline:hover { background: var(--accent); color: #fff; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.75rem 0; }
+
+/* ─── Stats strip (from custom.scss) ────────────────────────────────────── */
+
+.stats-strip { display: flex; gap: 2rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.stat { display: flex; flex-direction: column; align-items: center; }
+.stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+.stat-label { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.15rem; }
+
+@media (prefers-color-scheme: dark) {
+  .stat-value { color: var(--link); }
+}
+
+/* ─── Footer (Quarto nav-footer) ────────────────────────────────────────── */
+
+.site-footer {
+  background: var(--footer-bg);
+  color: var(--footer-fg);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 1rem 16px;
+}
+.site-footer a { color: var(--footer-fg); }
