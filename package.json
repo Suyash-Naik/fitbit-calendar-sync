@@ -1,0 +1,13 @@
+{
+  "name": "fitbit-calendar-sync",
+  "private": true,
+  "description": "Google Apps Script: sync Google Health (Fitbit) sleep, naps and workouts to Google Calendar",
+  "scripts": {
+    "test": "node --test test/",
+    "push": "clasp push",
+    "logs": "clasp logs"
+  },
+  "devDependencies": {
+    "@types/google-apps-script": "^1.0.83"
+  }
+}
