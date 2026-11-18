@@ -1,0 +1,18 @@
+{
+  "dataPointName": "users/user-id/dataTypes/sleep/dataPoints/data-point-id",
+  "sleep": {
+    "interval": { "startTime": "2026-03-03T20:57:30Z", "startUtcOffset": "0s", "endTime": "2026-03-04T04:41:30Z", "endUtcOffset": "0s" },
+    "type": "STAGES",
+    "metadata": { "stagesStatus": "SUCCEEDED", "processed": true, "mainSleep": true },
+    "summary": {
+      "minutesInSleepPeriod": "464", "minutesAfterWakeUp": "0", "minutesToFallAsleep": "0",
+      "minutesAsleep": "407", "minutesAwake": "57",
+      "stagesSummary": [
+        { "type": "AWAKE", "minutes": "56", "count": "12" },
+        { "type": "LIGHT", "minutes": "198", "count": "19" },
+        { "type": "DEEP", "minutes": "114", "count": "10" },
+        { "type": "REM", "minutes": "94", "count": "4" }
+      ]
+    }
+  }
+}
