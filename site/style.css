@@ -97,7 +97,7 @@ pre {
 }
 pre code { color: var(--fg); }
 @media (max-width: 600px) {
-  pre { white-space: pre-wrap; padding: 0.85rem 1rem; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 0.85rem 1rem; }
 }
 
 /* ─── Navbar (Lux: uppercase, semibold) ─────────────────────────────────── */
@@ -171,6 +171,73 @@ main {
 
 @media (prefers-color-scheme: dark) {
   .stat-value { color: var(--link); }
+}
+
+/* ─── Guide page: steps, callouts, tables, TOC ──────────────────────────── */
+
+html { scroll-behavior: smooth; }
+h2[id] { scroll-margin-top: 5rem; }  /* clear the sticky navbar on anchor jumps */
+
+:not(pre) > code { overflow-wrap: anywhere; }
+
+var {
+  font-style: normal;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9em;
+  color: var(--accent);
+  font-weight: 600;
+}
+pre var { color: var(--link); }
+@media (prefers-color-scheme: dark) {
+  var, ol.steps > li::marker { color: var(--link); }
+  .callout { border-left-color: var(--link); }
+}
+
+.note { color: var(--muted); font-size: 0.92rem; }
+
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 8px 8px 0;
+  padding: 0.9rem 1.25rem;
+  margin: 1.25rem 0 1.5rem;
+}
+
+.toc {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem 0.5rem;
+  margin: 1.5rem 0 2rem;
+}
+.toc-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.toc ol { columns: 2; column-gap: 2rem; padding-left: 1.25rem; }
+.toc li { margin-bottom: 0.25rem; break-inside: avoid; }
+.toc a { font-weight: 500; }
+@media (max-width: 600px) { .toc ol { columns: 1; } }
+
+ol.steps { padding-left: 1.4rem; }
+ol.steps > li { margin-bottom: 1rem; padding-left: 0.25rem; }
+ol.steps > li::marker { color: var(--accent); font-weight: 700; }
+ol.steps ul { margin-top: 0.4rem; }
+ol.steps pre { margin: 0.6rem 0; }
+
+.table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border); }
+th {
+  color: var(--heading);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom-width: 2px;
 }
 
 /* ─── Footer (Quarto nav-footer) ────────────────────────────────────────── */

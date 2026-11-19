@@ -41,7 +41,7 @@ fitbit-calendar-sync/
 │  └─ debug.js          debugDump, debugSchema, debugWorkoutTypes (schema views are values-free)
 ├─ test/                node --test unit tests + scrubbed fixtures
 ├─ docs/                reference material, see docs/index.md
-├─ site/                public website: index.html, privacy.html, terms.html
+├─ site/                public website: index.html, guide.html, privacy.html, terms.html
 └─ .github/workflows/
    └─ pages.yml         deploys site/ to GitHub Pages on push
 ```
