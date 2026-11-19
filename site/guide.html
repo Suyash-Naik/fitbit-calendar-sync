@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Setup Guide · Fitbit Calendar Sync</title>
-<meta name="description" content="Step-by-step guide to running your own copy of Fitbit Calendar Sync: Google Cloud project, Apps Script, OAuth client and first sync.">
+<title>Setup Guide · Naik Health-to-Calendar</title>
+<meta name="description" content="Step-by-step guide to running your own copy of Naik Health-to-Calendar: Google Cloud project, Apps Script, OAuth client and first sync.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="navbar">
   <div class="navbar-inner">
-    <a class="brand" href="./">Fitbit Calendar Sync</a>
+    <a class="brand" href="./">Naik Health-to-Calendar</a>
     <nav aria-label="Site">
       <a href="./">Home</a>
       <a href="guide.html" aria-current="page">Guide</a>
@@ -94,7 +94,7 @@ npm test        # optional: unit tests for the formatting code</code></pre>
     </li>
     <li><strong>Consent screen.</strong> <strong>APIs and services → OAuth consent screen</strong> (opens the <em>Google Auth Platform</em>) → <strong>Get started</strong>:
       <ul>
-        <li>App name: <code>Fitbit Calendar Sync</code>; support email: your address</li>
+        <li>App name: a name that identifies <em>you</em>, e.g. <code>Jane Doe Health-to-Calendar</code>. Google rejects names that contain its brands (<em>Fitbit</em>, <em>Google</em>…) or that don't identify the publisher. Support email: your address</li>
         <li>Audience: <strong>External</strong> (Internal is greyed out for personal Gmail)</li>
         <li>Contact information: your address → agree → <strong>Create</strong></li>
       </ul>
@@ -115,7 +115,7 @@ https://www.googleapis.com/auth/script.send_mail</code></pre>
   <!-- ─────────────────────────────────────────────────────────── -->
   <h2 id="script">4. Apps Script project</h2>
   <ol class="steps">
-    <li><strong>Create it.</strong> <a href="https://script.google.com">script.google.com</a> → <strong>New project</strong> → rename to <code>Fitbit Calendar Sync</code>.</li>
+    <li><strong>Create it.</strong> <a href="https://script.google.com">script.google.com</a> → <strong>New project</strong> → rename it, e.g. to <code>Health-to-Calendar</code>.</li>
     <li><strong>Link it to your Cloud project.</strong> ⚙ <strong>Project Settings</strong> → <em>Google Cloud Platform (GCP) Project</em> → <strong>Change project</strong> → paste <var>PROJECT_NUMBER</var> → <strong>Set project</strong>.
       <p class="note">"Consent screen not configured"? Finish steps 3.3–3.5 first.</p>
     </li>
@@ -170,7 +170,7 @@ https://www.googleapis.com/auth/script.send_mail</code></pre>
   <ol class="steps">
     <li><strong>Authorize Health.</strong> Open <code>auth.gs</code> → select <code>authorizeHealth</code> → <strong>Run</strong>.
       <ul>
-        <li>The first run asks for the Apps Script permissions (Calendar, external requests, triggers, email). On <em>"Google hasn't verified this app"</em>: <strong>Advanced → Go to Fitbit Calendar Sync</strong>.</li>
+        <li>The first run asks for the Apps Script permissions (Calendar, external requests, triggers, email). On <em>"Google hasn't verified this app"</em>: <strong>Advanced → Go to <var>your app name</var></strong>.</li>
         <li>The <strong>Execution log</strong> prints the redirect URI (check it matches step 6.1) and a long <code>https://accounts.google.com/…</code> URL. Open that URL, pick your account, tick <strong>both</strong> health permissions → Continue.</li>
         <li>You land on <strong>"✅ Google Health authorized"</strong>. Close the tab.</li>
       </ul>

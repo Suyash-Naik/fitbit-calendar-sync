@@ -22,7 +22,7 @@ Do this **before** the consent screen. Otherwise the health scopes won't appear 
 ### A3. Consent screen: initial setup ✅
 - [x] **APIs and services → OAuth consent screen**, or the **Configure consent screen** button in the yellow banner on *Credentials*. This opens the **Google Auth Platform** pages.
 - [x] **Get started** wizard:
-  - App information: name `Fitbit Calendar Sync`, user support email = your Gmail
+  - App information: name `Naik Health-to-Calendar` (it must identify you and must not contain Google brands such as *Fitbit*; `Fitbit Calendar Sync` was rejected), user support email = your Gmail
   - Audience: **External** (Internal is greyed out for personal Gmail)
   - Contact information: your Gmail
   - Agree to the policy → **Create**
@@ -122,7 +122,7 @@ The site lives in [`site/`](../site/): `index.html` (home page), `privacy.html` 
   - On a free GitHub plan, Pages needs the repo to be **public**. Check first that nothing secret is committed. The OAuth **client secret** lives only in Script properties; the script ID and project number are identifiers, not secrets.
 - [ ] Repo → **Settings → Pages** → *Build and deployment* → Source: **GitHub Actions**. (Do this once, before or after the first push.)
 - [ ] Repo → **Actions** → *Deploy site to GitHub Pages*. Check that it went green. If it ran before Pages was enabled, open it → **Run workflow**.
-- [ ] The site is live at `https://<github-username>.github.io/<repo-name>/`, e.g. `https://suyash-naik.github.io/fitbit-calendar-sync/`
+- [x] The site is live at `https://<github-username>.github.io/<repo-name>/`. Here the GitHub user site has a custom domain, so `suyash-naik.github.io/...` redirects (301) to **`https://suyashnaik.com/fitbit-calendar-sync/`**. Use the final `suyashnaik.com` URLs and domain in D2, not the redirecting `github.io` ones: the links must sit on an authorised domain.
 - [ ] Open `/`, `/privacy.html` and `/terms.html` in a private window to check they load.
 
 > Links pointing at `github.com/.../blob/...` or `sites.google.com` won't work. The domain must be one you can add under *Authorised domains*. Here that's your `<github-username>.github.io`.
@@ -131,16 +131,19 @@ The site lives in [`site/`](../site/): `index.html` (home page), `privacy.html` 
 
 ### D2. Fill in Branding
 - [ ] Google Auth Platform → **Branding**
-- [ ] *Application home page*: `https://<github-username>.github.io/<repo-name>/`
-- [ ] *Application privacy policy link*: `https://<github-username>.github.io/<repo-name>/privacy.html`
-- [ ] *Application Terms of Service link*: `https://<github-username>.github.io/<repo-name>/terms.html`
-- [ ] *Authorised domains* → **+ Add domain** → `<github-username>.github.io` (lowercase, no `https://`, no path)
+- [ ] *Application home page*: `https://suyashnaik.com/fitbit-calendar-sync/`
+- [ ] *Application privacy policy link*: `https://suyashnaik.com/fitbit-calendar-sync/privacy.html`
+- [ ] *Application Terms of Service link*: `https://suyashnaik.com/fitbit-calendar-sync/terms.html`
+- [ ] *Authorised domains* → **+ Add domain** → `suyashnaik.com` (lowercase, no `https://`, no path)
+  - Without a custom domain these would be `https://<github-username>.github.io/<repo-name>/…` and `<github-username>.github.io`.
+- [ ] If Google asks you to prove you own the domain: [Google Search Console](https://search.google.com/search-console) → **Add property → Domain** → `suyashnaik.com` → add the TXT record it shows at your DNS provider → **Verify**. Use the same Google account as the Cloud project.
 - [ ] **Don't upload a logo.** A logo forces full verification.
 - [ ] **Save**
 
 ### D3. Publish
 - [ ] **Audience** → **Publish app** → Confirm
-- [ ] If it warns about verification for sensitive or restricted scopes, you can still continue unverified. Google's cap for unverified apps is 100 users, and you're one. On first authorization you'll see **"Google hasn't verified this app"** → click **Advanced** → **Go to Fitbit Calendar Sync (unsafe)** → Allow.
+- [ ] If it warns about verification for sensitive or restricted scopes, you can still continue unverified. Google's cap for unverified apps is 100 users, and you're one. On first authorization you'll see **"Google hasn't verified this app"** → click **Advanced** → **Go to Naik Health-to-Calendar (unsafe)** → Allow.
+- [ ] **Re-authorize once after publishing.** Tokens issued while the app was in Testing keep their 7-day expiry. Run `resetHealthAuth`, then `authorizeHealth`, and open the logged URL again. Only the new refresh token is long-lived.
 - [ ] If publishing is **blocked outright** for the restricted health scopes, revert to Testing. The script will email you when authorization expires, and you re-run it once in the editor to re-authorize, about once a week.
 
 ---
@@ -151,7 +154,7 @@ The site lives in [`site/`](../site/): `index.html` (home page), `privacy.html` 
 
 - [ ] `clasp push` (after any code change)
 - [ ] Open `auth.gs` → select **`authorizeHealth`** → **Run**. The first time, approve the Apps Script prompt (Calendar, external requests, triggers, email).
-- [ ] In the **Execution log**, copy the long `https://accounts.google.com/...` URL → open it in the browser → choose your Gmail → *unverified app* → **Advanced → Go to Fitbit Calendar Sync** → tick **both health permissions** → Continue.
+- [ ] In the **Execution log**, copy the long `https://accounts.google.com/...` URL → open it in the browser → choose your Gmail → *unverified app* → **Advanced → Go to Naik Health-to-Calendar** → tick **both health permissions** → Continue.
 - [ ] You land on a page saying **"✅ Google Health authorized"**. Close the tab.
 - [ ] Open `debug.gs` → select **`debugDump`** → **Run**
 - [ ] Check the log for raw sleep and exercise JSON.
