@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup Guide · Fitbit Calendar Sync</title>
+<meta name="description" content="Step-by-step guide to running your own copy of Fitbit Calendar Sync: Google Cloud project, Apps Script, OAuth client and first sync.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="./">Fitbit Calendar Sync</a>
+    <nav aria-label="Site">
+      <a href="./">Home</a>
+      <a href="guide.html" aria-current="page">Guide</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="https://github.com/Suyash-Naik/fitbit-calendar-sync">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <h1>Setup Guide</h1>
+  <p class="lead">Run your own copy of the sync, in your own Google account.</p>
+
+  <p>This guide takes you from a fresh clone of the repository to a working sync. Everything runs under your account: your Cloud project, your Apps Script project, your OAuth client. Nothing is shared with the original author. Plan on about 30–45 minutes.</p>
+
+  <div class="callout">
+    <strong>Why a Cloud project?</strong> The code runs in Apps Script, but Apps Script's built-in hidden project can't turn on the Google Health API. So the script is linked to a Cloud project you own. That project needs a <em>consent screen</em>, which is only a private record here: you are its only user. It's not a published app.
+  </div>
+
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <ol>
+      <li><a href="#prereqs">Before you start</a></li>
+      <li><a href="#code">Get the code and tools</a></li>
+      <li><a href="#cloud">Google Cloud project</a></li>
+      <li><a href="#script">Apps Script project</a></li>
+      <li><a href="#push">Push the code</a></li>
+      <li><a href="#oauth">OAuth client for the Health API</a></li>
+      <li><a href="#run">Authorize and first sync</a></li>
+      <li><a href="#settings">Settings</a></li>
+      <li><a href="#publish">Optional: stop the 7-day re-authorization</a></li>
+      <li><a href="#trouble">Troubleshooting</a></li>
+    </ol>
+  </nav>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="prereqs">1. Before you start</h2>
+  <ul>
+    <li>A <strong>Google account</strong> whose Fitbit data is available through the Google Health API (Fitbit app linked to that account).</li>
+    <li><strong>Node.js 18+</strong> and <strong>git</strong> on your computer.</li>
+    <li>Throughout this guide, replace placeholders like <var>SCRIPT_ID</var> with your own values. You'll collect them along the way:</li>
+  </ul>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Value</th><th>Where it comes from</th><th>Secret?</th></tr></thead>
+    <tbody>
+      <tr><td><var>PROJECT_NUMBER</var></td><td>Cloud project, step 3.6</td><td>No</td></tr>
+      <tr><td><var>SCRIPT_ID</var></td><td>Apps Script project, step 4.3</td><td>No</td></tr>
+      <tr><td><var>CLIENT_ID</var> / <var>CLIENT_SECRET</var></td><td>OAuth client, step 6.1</td><td><strong>The secret is.</strong> Keep it out of git and chat.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="code">2. Get the code and tools</h2>
+  <ol class="steps">
+    <li>Clone the repository and install the dev dependencies (editor type hints only):
+<pre><code>git clone https://github.com/Suyash-Naik/fitbit-calendar-sync.git
+cd fitbit-calendar-sync
+npm install
+npm test        # optional: unit tests for the formatting code</code></pre>
+    </li>
+    <li>Install <a href="https://github.com/google/clasp">clasp</a>, Google's command-line tool for Apps Script:
+<pre><code>npm install -g @google/clasp</code></pre>
+      <p class="note">Windows PowerShell says <em>"clasp.ps1 cannot be loaded because running scripts is disabled"</em>? Run once: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code></p>
+    </li>
+    <li>Turn on the Apps Script API for your account: <a href="https://script.google.com/home/usersettings">script.google.com/home/usersettings</a> → <strong>Google Apps Script API: On</strong>.</li>
+    <li>Log in with the same Google account: <code>clasp login</code>. A browser window opens; approve it.</li>
+  </ol>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="cloud">3. Google Cloud project</h2>
+  <ol class="steps">
+    <li><strong>Create the project.</strong> <a href="https://console.cloud.google.com">console.cloud.google.com</a> → project selector → <strong>New project</strong>. Any name works, e.g. <code>fitbit-sync</code>.</li>
+    <li><strong>Enable the APIs.</strong> Do this <em>before</em> the consent screen, or the health scopes won't show up later.
+      <ul>
+        <li><strong>APIs and services → Library</strong> → search <strong>Google Health API</strong> → <strong>Enable</strong></li>
+        <li>Same for <strong>Google Calendar API</strong></li>
+      </ul>
+    </li>
+    <li><strong>Consent screen.</strong> <strong>APIs and services → OAuth consent screen</strong> (opens the <em>Google Auth Platform</em>) → <strong>Get started</strong>:
+      <ul>
+        <li>App name: <code>Fitbit Calendar Sync</code>; support email: your address</li>
+        <li>Audience: <strong>External</strong> (Internal is greyed out for personal Gmail)</li>
+        <li>Contact information: your address → agree → <strong>Create</strong></li>
+      </ul>
+    </li>
+    <li><strong>Scopes.</strong> Sidebar → <strong>Data Access</strong> → <strong>Add or remove scopes</strong> → scroll to <strong>Manually add scopes</strong> → paste:
+<pre><code>https://www.googleapis.com/auth/calendar
+https://www.googleapis.com/auth/googlehealth.sleep.readonly
+https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly
+https://www.googleapis.com/auth/script.external_request
+https://www.googleapis.com/auth/script.scriptapp
+https://www.googleapis.com/auth/script.send_mail</code></pre>
+      <strong>Add to table</strong> → <strong>Update</strong> → <strong>Save</strong>. "Sensitive" and "restricted" labels are expected.
+    </li>
+    <li><strong>Test user.</strong> Sidebar → <strong>Audience</strong> → <strong>Test users</strong> → <strong>+ Add users</strong> → your address → <strong>Save</strong>. Leave <em>Publishing status</em> on <strong>Testing</strong>.</li>
+    <li><strong>Copy the project number.</strong> <strong>Cloud overview → Dashboard</strong> → <em>Project info</em> → <var>PROJECT_NUMBER</var>. It's the all-digits one, <em>not</em> the project ID.</li>
+  </ol>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="script">4. Apps Script project</h2>
+  <ol class="steps">
+    <li><strong>Create it.</strong> <a href="https://script.google.com">script.google.com</a> → <strong>New project</strong> → rename to <code>Fitbit Calendar Sync</code>.</li>
+    <li><strong>Link it to your Cloud project.</strong> ⚙ <strong>Project Settings</strong> → <em>Google Cloud Platform (GCP) Project</em> → <strong>Change project</strong> → paste <var>PROJECT_NUMBER</var> → <strong>Set project</strong>.
+      <p class="note">"Consent screen not configured"? Finish steps 3.3–3.5 first.</p>
+    </li>
+    <li><strong>Copy the script ID.</strong> Same page → <strong>IDs</strong> → <var>SCRIPT_ID</var>.</li>
+  </ol>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="push">5. Push the code</h2>
+  <ol class="steps">
+    <li>In the repo, open <code>.clasp.json</code> and replace the <code>scriptId</code> with yours. It currently points at the original author's project, which you can't push to:
+<pre><code>{
+  "scriptId": "<var>SCRIPT_ID</var>",
+  "rootDir": "src"
+}</code></pre>
+    </li>
+    <li>Upload the code: <code>clasp push</code>. If it asks to overwrite the manifest, answer <strong>y</strong>.</li>
+    <li>Reload the Apps Script editor tab. You should see <code>auth.gs</code>, <code>main.gs</code>, <code>health.gs</code> and the others.</li>
+  </ol>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="oauth">6. OAuth client for the Health API</h2>
+  <div class="callout">
+    <strong>Why a second OAuth client?</strong> The Health API rejects Apps Script's built-in token (<code>403 DISALLOWED_OAUTH_SCOPES</code>), because that token also carries Calendar, UrlFetch and trigger scopes. So the script requests a separate, health-only token through its own client (<code>src/auth.js</code>).
+  </div>
+  <ol class="steps">
+    <li><strong>Create the client.</strong> Cloud console → <strong>APIs and services → Credentials</strong> → <strong>+ Create credentials → OAuth client ID</strong>:
+      <ul>
+        <li>Application type: <strong>Web application</strong></li>
+        <li>Authorised redirect URIs → <strong>+ Add URI</strong> → exactly:
+<pre><code>https://script.google.com/macros/d/<var>SCRIPT_ID</var>/usercallback</code></pre></li>
+        <li>Leave <em>Authorised JavaScript origins</em> empty → <strong>Create</strong></li>
+      </ul>
+      Copy <var>CLIENT_ID</var> and <var>CLIENT_SECRET</var> from the dialog.
+    </li>
+    <li><strong>Store them in the script.</strong> Apps Script → ⚙ <strong>Project Settings</strong> → <strong>Script properties</strong> → <strong>Add script property</strong>:
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td><code>HEALTH_CLIENT_ID</code></td><td><var>CLIENT_ID</var></td></tr>
+          <tr><td><code>HEALTH_CLIENT_SECRET</code></td><td><var>CLIENT_SECRET</var></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <strong>Save script properties.</strong> They live only in your Apps Script project, never in code or git.
+    </li>
+  </ol>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="run">7. Authorize and first sync</h2>
+  <p class="note">Functions ending in <code>_</code> are private and hidden from the Run menu. If the Run button is greyed out, open a file that has public functions, like <code>auth.gs</code> or <code>main.gs</code>.</p>
+  <ol class="steps">
+    <li><strong>Authorize Health.</strong> Open <code>auth.gs</code> → select <code>authorizeHealth</code> → <strong>Run</strong>.
+      <ul>
+        <li>The first run asks for the Apps Script permissions (Calendar, external requests, triggers, email). On <em>"Google hasn't verified this app"</em>: <strong>Advanced → Go to Fitbit Calendar Sync</strong>.</li>
+        <li>The <strong>Execution log</strong> prints the redirect URI (check it matches step 6.1) and a long <code>https://accounts.google.com/…</code> URL. Open that URL, pick your account, tick <strong>both</strong> health permissions → Continue.</li>
+        <li>You land on <strong>"✅ Google Health authorized"</strong>. Close the tab.</li>
+      </ul>
+    </li>
+    <li><strong>Dry run.</strong> <code>main.gs</code> → <code>syncDryRun</code> → Run. The log lists every event it <em>would</em> create; nothing is written.</li>
+    <li><strong>Real sync.</strong> <code>syncAll</code> → Run. This creates the <strong>Fitbit</strong> calendar and its events. Check Google Calendar.</li>
+    <li><strong>Check for duplicates.</strong> Run <code>syncAll</code> again. The log should show <code>"created":0</code>, everything <code>unchanged</code>.</li>
+    <li><strong>Schedule it.</strong> <code>installTrigger</code> → Run. It now syncs every 4 hours (see ⏰ <strong>Triggers</strong> in the sidebar).</li>
+    <li><em>Optional:</em> <code>backfill30</code> → Run, to fill in the last 30 days.</li>
+  </ol>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Function</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>authorizeHealth</code></td><td>Logs the link for the Health consent. Re-run when authorization expires</td></tr>
+      <tr><td><code>syncDryRun</code></td><td>Logs the events it would create, no calendar changes</td></tr>
+      <tr><td><code>syncAll</code></td><td>The real sync; the trigger calls this</td></tr>
+      <tr><td><code>installTrigger</code> / <code>uninstallTrigger</code></td><td>Start / stop the 4-hourly sync</td></tr>
+      <tr><td><code>backfill30</code></td><td>Sync the last 30 days once</td></tr>
+      <tr><td><code>wipeSyncedEvents</code></td><td>Delete every event this script created, and nothing else</td></tr>
+      <tr><td><code>resetHealthAuth</code></td><td>Forget the stored Health tokens</td></tr>
+      <tr><td><code>debugSchema</code> / <code>debugWorkoutTypes</code></td><td>Show data structure and workout types without personal values</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="settings">8. Settings</h2>
+  <p>All optional, under <strong>Project Settings → Script properties</strong>. No code change or push needed; the next run picks them up.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Property</th><th>Default</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>CALENDAR_NAME</code></td><td><code>Fitbit</code></td><td>Target calendar, created automatically</td></tr>
+      <tr><td><code>LOOKBACK_DAYS</code></td><td><code>2</code></td><td>Days re-checked on each run</td></tr>
+      <tr><td><code>INCLUDE_NAPS</code></td><td><code>true</code></td><td>Sync non-main sleep sessions</td></tr>
+      <tr><td><code>MIN_WORKOUT_MINUTES</code></td><td><code>0</code></td><td>Skip shorter workouts, e.g. <code>15</code> hides short auto-detected walks</td></tr>
+      <tr><td><code>EXCLUDE_TYPES</code></td><td><em>empty</em></td><td>Comma-separated types, e.g. <code>WALKING</code></td></tr>
+      <tr><td><code>WORKOUT_COLOR_ID</code></td><td><code>10</code></td><td>Event colour for workouts; empty for the calendar colour</td></tr>
+      <tr><td><code>ALERT_EMAIL</code></td><td>your address</td><td>Where failure alerts go, at most one per 12 h</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="publish">9. Optional: stop the 7-day re-authorization</h2>
+  <p>While the consent screen is in <strong>Testing</strong>, Google expires the Health authorization every 7 days. The script emails you when that happens; re-running <code>authorizeHealth</code> fixes it. To remove the limit, publish the consent screen to <strong>In production</strong>. Google first requires a home page, privacy policy and terms of service on a domain you control.</p>
+  <ol class="steps">
+    <li><strong>Host your own pages.</strong> The <code>site/</code> folder holds this website, and <code>.github/workflows/pages.yml</code> deploys it to GitHub Pages.
+      <ul>
+        <li>Edit <code>site/privacy.html</code>, <code>site/terms.html</code> and the footers so they name <em>you</em>, not the original author.</li>
+        <li>Push to your own GitHub repo (public, on a free plan) → <strong>Settings → Pages → Source: GitHub Actions</strong>.</li>
+        <li>Your pages are at <code>https://<var>username</var>.github.io/<var>repo</var>/</code>, plus <code>privacy.html</code> and <code>terms.html</code>.</li>
+      </ul>
+    </li>
+    <li><strong>Branding.</strong> Google Auth Platform → <strong>Branding</strong>: fill in the three URLs, and under <em>Authorised domains</em> add <code><var>username</var>.github.io</code> (no <code>https://</code>, no path). <strong>Don't upload a logo</strong>; that forces full verification. <strong>Save</strong>.</li>
+    <li><strong>Publish.</strong> <strong>Audience → Publish app</strong>. Unverified apps are allowed up to 100 users, and you are one. You'll see the <em>unverified app</em> screen when authorizing; continue via <strong>Advanced</strong>.</li>
+  </ol>
+  <p class="note">If Google blocks publishing outright for the restricted health scopes, switch back to Testing and live with the weekly re-authorization.</p>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <h2 id="trouble">10. Troubleshooting</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Health scopes missing from the Data Access list</td><td>Enable the Google Health API (3.2), then use <em>Manually add scopes</em></td></tr>
+      <tr><td>"Change project" fails in Apps Script</td><td>Use the project <strong>number</strong>, not the ID, and finish the consent screen first</td></tr>
+      <tr><td><code>clasp push</code>: "User has not enabled the Apps Script API"</td><td>Turn it on at script.google.com/home/usersettings (2.3)</td></tr>
+      <tr><td><code>clasp push</code>: permission or "not found" error</td><td><code>.clasp.json</code> still has the original <code>scriptId</code>; use yours (5.1)</td></tr>
+      <tr><td>Run button greyed out / "No functions"</td><td>The open file has only private <code>_</code> functions. Open <code>auth.gs</code> or <code>main.gs</code></td></tr>
+      <tr><td><code>redirect_uri_mismatch</code></td><td>The redirect URI on the OAuth client must exactly match the one <code>authorizeHealth</code> logs</td></tr>
+      <tr><td><code>403 PERMISSION_DENIED</code> from health.googleapis.com</td><td>API not enabled, scope missing from Data Access, you're not a test user, or a health box was left unticked. Run <code>resetHealthAuth</code>, then <code>authorizeHealth</code></td></tr>
+      <tr><td><code>invalid_grant</code> / "authorization expired"</td><td>The 7-day Testing expiry. Run <code>authorizeHealth</code> again, or see step 9</td></tr>
+      <tr><td>"Missing script properties HEALTH_CLIENT_ID / HEALTH_CLIENT_SECRET"</td><td>Add both client properties (6.2)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="actions">
+    <a class="btn-primary" href="https://github.com/Suyash-Naik/fitbit-calendar-sync">View on GitHub</a>
+    <a class="btn-outline" href="#">Back to top</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  © 2026 Suyash Naik · <a href="guide.html">Guide</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · Not affiliated with Google or Fitbit
+</footer>
+</body>
+</html>
